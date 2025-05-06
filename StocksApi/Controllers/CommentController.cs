@@ -19,9 +19,9 @@ namespace StocksApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var comments = await _commentService.GetAllAsync();
+            var comments = await _commentService.GetAllAsync(cancellationToken);
             if (comments == null || !comments.Any())
                 return NotFound("No comments found.");
             var commentDtos = comments.Select(c => c.ToCommentDto()).ToList();
@@ -30,9 +30,9 @@ namespace StocksApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var comment = await _commentService.GetByIdAsync(id);
+            var comment = await _commentService.GetByIdAsync(id, cancellationToken);
             if (comment == null)
                 return NotFound($"Comment with ID {id} not found.");
 
@@ -40,21 +40,21 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost("{stockId}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
+        public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto, CancellationToken cancellationToken)
         {
             if (!await _stockService.StockExists(stockId))
                 return BadRequest("Stock does not exist");
 
             var comment = commentDto.ToCommentFromCreate(stockId);
-            await _commentService.CreateAsync(comment);
+            await _commentService.CreateAsync(comment, cancellationToken);
 
             return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDto());
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto, CancellationToken cancellationToken)
         {
-            var updatedComment = await _commentService.UpdateAsync(id, commentDto.ToCommentFromUpdate());
+            var updatedComment = await _commentService.UpdateAsync(id, commentDto.ToCommentFromUpdate(), cancellationToken);
             if (updatedComment == null)
                 return NotFound($"Comment with ID {id} not found.");
 
@@ -62,9 +62,9 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var deletedComment = await _commentService.DeleteAsync(id);
+            var deletedComment = await _commentService.DeleteAsync(id, cancellationToken);
             if (deletedComment == null)
                 return NotFound($"Comment with ID {id} not found.");
 

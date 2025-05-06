@@ -15,28 +15,28 @@ namespace StocksApi.Services.Implementations
         {
             _stockRepo = stockRepo;
         }
-        public async Task<Stock> CreateAsync(CreateStockDto stockDto)
+        public async Task<Stock> CreateAsync(CreateStockDto stockDto, CancellationToken cancellationToken)
         {
             var stock = stockDto.ToStockFromCreateDto();
-            return await _stockRepo.CreateAsync(stock);
+            return await _stockRepo.CreateAsync(stock, cancellationToken);
         }
 
-        public async Task<Stock?> DeleteAsync(int id)
+        public async Task<Stock?> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             if (!await _stockRepo.StockExists(id))
                 return null;
 
-            return await _stockRepo.DeleteAsync(id);
+            return await _stockRepo.DeleteAsync(id, cancellationToken);
         }
 
-        public async Task<List<Stock>> GetAllAsync(QueryObject query)
+        public async Task<List<Stock>> GetAllAsync(QueryObject query, CancellationToken cancellationToken)
         {
-            return await _stockRepo.GetAllAsync(query);
+            return await _stockRepo.GetAllAsync(query, cancellationToken);
         }
 
-        public async Task<Stock?> GetByIdAsync(int id)
+        public async Task<Stock?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _stockRepo.GetByIdAsync(id);
+            return await _stockRepo.GetByIdAsync(id, cancellationToken);
         }
 
         public async Task<bool> StockExists(int id)
@@ -44,9 +44,9 @@ namespace StocksApi.Services.Implementations
             return await _stockRepo.StockExists(id);
         }
 
-        public async Task<Stock?> UpdateAsync(int id, UpdateStockDto stockDto)
+        public async Task<Stock?> UpdateAsync(int id, UpdateStockDto stockDto, CancellationToken cancellationToken)
         {
-            var existingStock = await _stockRepo.GetByIdAsync(id);
+            var existingStock = await _stockRepo.GetByIdAsync(id, cancellationToken);
             if (existingStock == null)
                 return null;
 
@@ -57,7 +57,7 @@ namespace StocksApi.Services.Implementations
             existingStock.Industry = stockDto.Industry;
             existingStock.MarketCap = stockDto.MarketCap;
 
-            return await _stockRepo.UpdateAsync(existingStock);
+            return await _stockRepo.UpdateAsync(existingStock, cancellationToken);
         }
     }
 }

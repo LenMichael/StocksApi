@@ -11,33 +11,33 @@ namespace StocksApi.Services.Implementations
         {
             _commentRepo = commentRepo;
         }
-        public async Task<Comment> CreateAsync(Comment comment)
+        public async Task<Comment> CreateAsync(Comment comment, CancellationToken cancellationToken)
         {
             comment.CreatedAt = DateTime.Now;
-            return await _commentRepo.AddAsync(comment);
+            return await _commentRepo.AddAsync(comment, cancellationToken);
         }
 
-        public async Task<Comment?> DeleteAsync(int id)
+        public async Task<Comment?> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var existingComment = await _commentRepo.GetByIdAsync(id);
+            var existingComment = await _commentRepo.GetByIdAsync(id, cancellationToken);
             if (existingComment == null)
                 return null;
-            return await _commentRepo.DeleteAsync(id);
+            return await _commentRepo.DeleteAsync(id, cancellationToken);
         }
 
-        public async Task<List<Comment>> GetAllAsync()
+        public async Task<List<Comment>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _commentRepo.GetAllAsync();
+            return await _commentRepo.GetAllAsync(cancellationToken);
         }
 
-        public async Task<Comment?> GetByIdAsync(int id)
+        public async Task<Comment?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _commentRepo.GetByIdAsync(id);
+            return await _commentRepo.GetByIdAsync(id, cancellationToken);
         }
 
-        public async Task<Comment?> UpdateAsync(int id, Comment comment)
+        public async Task<Comment?> UpdateAsync(int id, Comment comment, CancellationToken cancellationToken)
         {
-            var existingComment = await _commentRepo.GetByIdAsync(id);
+            var existingComment = await _commentRepo.GetByIdAsync(id, cancellationToken);
             if (existingComment == null)
                 return null;
 
@@ -45,7 +45,7 @@ namespace StocksApi.Services.Implementations
             existingComment.Content = comment.Content;
             existingComment.CreatedAt = DateTime.Now;
 
-            return await _commentRepo.UpdateAsync(id, existingComment);
+            return await _commentRepo.UpdateAsync(id, existingComment, cancellationToken);
         }
     }
 }

@@ -13,36 +13,36 @@ namespace StocksApi.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<Comment> AddAsync(Comment comment)
+        public async Task<Comment> AddAsync(Comment comment, CancellationToken cancellationToken)
         {
-            await _context.Comments.AddAsync(comment);
-            await _context.SaveChangesAsync();
+            await _context.Comments.AddAsync(comment, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
             return comment;
         }
 
-        public async Task<Comment?> DeleteAsync(int id)
+        public async Task<Comment?> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _context.Comments.FindAsync(id, cancellationToken);
             if (comment == null)
                 return null;
             _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return comment;
         }
 
-        public async Task<List<Comment>> GetAllAsync()
+        public async Task<List<Comment>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.Comments.ToListAsync(); 
+            return await _context.Comments.ToListAsync(cancellationToken); 
         }
 
-        public async Task<Comment?> GetByIdAsync(int id)
+        public async Task<Comment?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.Comments.FindAsync(id);
+            return await _context.Comments.FindAsync(id, cancellationToken);
         }
 
-        public async Task<Comment?> UpdateAsync(int id, Comment comment)
+        public async Task<Comment?> UpdateAsync(int id, Comment comment, CancellationToken cancellationToken)
         {
-            var existingComment = await _context.Comments.FindAsync(id);
+            var existingComment = await _context.Comments.FindAsync(id, cancellationToken);
             if (existingComment == null)
                 return null;
 
@@ -51,7 +51,7 @@ namespace StocksApi.Repositories.Implementations
             //existingComment.CreatedAt = comment.CreatedAt;
             _context.Entry(existingComment).CurrentValues.SetValues(comment);
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return existingComment;
         }
     }

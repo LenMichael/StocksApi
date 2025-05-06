@@ -18,25 +18,25 @@ namespace StocksApi.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<Stock> CreateAsync(Stock stock)
+        public async Task<Stock> CreateAsync(Stock stock, CancellationToken cancellationToken)
         {
-            await _context.Stocks.AddAsync(stock);
-            await _context.SaveChangesAsync();
+            await _context.Stocks.AddAsync(stock, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
             return stock;
         }
 
-        public async Task<Stock> DeleteAsync(int id)
+        public async Task<Stock> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var stock = await _context.Stocks.FindAsync(id);
+            var stock = await _context.Stocks.FindAsync(id, cancellationToken);
             if (stock == null)
                 return null;
 
             _context.Stocks.Remove(stock);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return stock;
         }
 
-        public async Task<List<Stock>> GetAllAsync(QueryObject query)
+        public async Task<List<Stock>> GetAllAsync(QueryObject query, CancellationToken cancellationToken)
         {
             var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
 
@@ -55,10 +55,10 @@ namespace StocksApi.Repositories.Implementations
             // Pagination
             var skipNumber = query.PageSize * (query.PageNumber - 1);
 
-            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync(cancellationToken);
         }
 
-        public async Task<Stock?> GetByIdAsync(int id)
+        public async Task<Stock?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var stock = await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
             if (stock == null)
@@ -71,14 +71,14 @@ namespace StocksApi.Repositories.Implementations
             return await _context.Stocks.AnyAsync(x => x.Id == id);
         }
 
-        public async Task<Stock?> UpdateAsync(Stock stock)
+        public async Task<Stock?> UpdateAsync(Stock stock, CancellationToken cancellationToken)
         {
-            var existingStock = await _context.Stocks.FindAsync(stock.Id);
+            var existingStock = await _context.Stocks.FindAsync(stock.Id, cancellationToken);
             if (existingStock == null)
                 return null;
 
             _context.Entry(existingStock).CurrentValues.SetValues(stock);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return existingStock;
         }
     }

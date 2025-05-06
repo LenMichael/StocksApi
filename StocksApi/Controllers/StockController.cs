@@ -20,17 +20,17 @@ namespace StocksApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query, CancellationToken cancellationToken)
         {
-            var stocks = await _stockService.GetAllAsync(query);
+            var stocks = await _stockService.GetAllAsync(query, cancellationToken);
             var stockDtos = stocks.Select(x => x.ToStockDto());
             return Ok(stockDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var stock = await _stockService.GetByIdAsync(id);
+            var stock = await _stockService.GetByIdAsync(id, cancellationToken);
             if (stock == null)
                 return NotFound();
          
@@ -38,22 +38,22 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateStockDto stockDto)
+        public async Task<IActionResult> Create([FromBody] CreateStockDto stockDto, CancellationToken cancellationToken)
         {
             if (stockDto == null)
                 return BadRequest();
             var stock = stockDto.ToStockFromCreateDto();
-            await _stockService.CreateAsync(stockDto);
+            await _stockService.CreateAsync(stockDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock.ToStockDto());
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto stockDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto stockDto, CancellationToken cancellationToken)
         {
             if (stockDto == null)
                 return BadRequest();
 
-            var stock = await _stockService.UpdateAsync(id, stockDto);
+            var stock = await _stockService.UpdateAsync(id, stockDto, cancellationToken);
             if (stock == null)
                 return NotFound();
          
@@ -62,9 +62,9 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var stock = await _stockService.DeleteAsync(id);
+            var stock = await _stockService.DeleteAsync(id, cancellationToken);
             if (stock == null)
                 return NotFound();
 
