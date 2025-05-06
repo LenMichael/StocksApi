@@ -12,8 +12,8 @@ using StocksApi.Data;
 namespace StocksApi.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250506010653_Identity")]
-    partial class Identity
+    [Migration("20250506172621_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,20 @@ namespace StocksApi.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "4e4c2f65-4dbb-44d1-8819-a70e4253e0fd",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "62204e9a-6673-4c33-9931-3f7fadde286d",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

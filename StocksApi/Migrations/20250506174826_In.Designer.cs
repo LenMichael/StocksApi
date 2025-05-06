@@ -12,8 +12,8 @@ using StocksApi.Data;
 namespace StocksApi.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250506012208_Roles")]
-    partial class Roles
+    [Migration("20250506174826_In")]
+    partial class In
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace StocksApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b87391bd-c29b-4565-8486-775d7da62af0",
+                            Id = "4c8ea336-373d-42e3-b266-fc29d84aedc0",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "1c5d9a14-d6a4-41ea-85c8-b0092ae61100",
+                            Id = "16367983-603e-4778-b3fe-2083fd9000e7",
                             Name = "User",
                             NormalizedName = "USER"
                         });

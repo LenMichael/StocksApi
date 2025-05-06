@@ -7,7 +7,7 @@
 namespace StocksApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Roles : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,8 @@ namespace StocksApi.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1c5d9a14-d6a4-41ea-85c8-b0092ae61100", null, "User", "USER" },
-                    { "b87391bd-c29b-4565-8486-775d7da62af0", null, "Admin", "ADMIN" }
+                    { "4e4c2f65-4dbb-44d1-8819-a70e4253e0fd", null, "Admin", "ADMIN" },
+                    { "62204e9a-6673-4c33-9931-3f7fadde286d", null, "User", "USER" }
                 });
         }
 
@@ -28,12 +28,12 @@ namespace StocksApi.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "1c5d9a14-d6a4-41ea-85c8-b0092ae61100");
+                keyValue: "4e4c2f65-4dbb-44d1-8819-a70e4253e0fd");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "b87391bd-c29b-4565-8486-775d7da62af0");
+                keyValue: "62204e9a-6673-4c33-9931-3f7fadde286d");
         }
     }
 }
