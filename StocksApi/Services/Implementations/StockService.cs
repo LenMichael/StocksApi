@@ -1,5 +1,6 @@
 ﻿using StocksApi.Data;
 using StocksApi.Dtos.Stocks;
+using StocksApi.Filters;
 using StocksApi.Mappers;
 using StocksApi.Models;
 using StocksApi.Repositories.Interfaces;
@@ -20,7 +21,7 @@ namespace StocksApi.Services.Implementations
             return await _stockRepo.CreateAsync(stock);
         }
 
-        public async Task<Stock> DeleteAsync(int id)
+        public async Task<Stock?> DeleteAsync(int id)
         {
             if (!await _stockRepo.StockExists(id))
                 return null;
@@ -28,9 +29,9 @@ namespace StocksApi.Services.Implementations
             return await _stockRepo.DeleteAsync(id);
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _stockRepo.GetAllAsync();
+            return await _stockRepo.GetAllAsync(query);
         }
 
         public async Task<Stock?> GetByIdAsync(int id)

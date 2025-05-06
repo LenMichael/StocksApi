@@ -22,7 +22,7 @@ namespace StocksApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var stocks = await _stockService.GetAllAsync();
+            var stocks = await _stockService.GetAllAsync(query);
             var stockDtos = stocks.Select(x => x.ToStockDto());
             return Ok(stockDtos);
         }
