@@ -32,12 +32,12 @@ namespace StocksApi.Repositories.Implementations
 
         public async Task<List<Comment>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.Comments.ToListAsync(cancellationToken); 
+            return await _context.Comments.Include(u=> u.User).ToListAsync(cancellationToken); 
         }
 
         public async Task<Comment?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.Comments.FindAsync(id, cancellationToken);
+            return await _context.Comments.Include(u => u.User).FirstOrDefaultAsync(c=> c.Id == id, cancellationToken);
         }
 
         public async Task<Comment?> UpdateAsync(int id, Comment comment, CancellationToken cancellationToken)

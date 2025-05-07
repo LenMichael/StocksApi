@@ -12,8 +12,8 @@ using StocksApi.Data;
 namespace StocksApi.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250506174826_In")]
-    partial class In
+    [Migration("20250506182348_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace StocksApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4c8ea336-373d-42e3-b266-fc29d84aedc0",
+                            Id = "a85adb83-b0b0-4c4e-b343-2355aaaa5687",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "16367983-603e-4778-b3fe-2083fd9000e7",
+                            Id = "abaa87e5-4a66-4ba5-bd42-92731d1cbe06",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -199,6 +199,21 @@ namespace StocksApi.Migrations
                     b.HasIndex("StockId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("StocksApi.Models.Portfolio", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "StockId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Portfolios");
                 });
 
             modelBuilder.Entity("StocksApi.Models.Stock", b =>
@@ -360,9 +375,35 @@ namespace StocksApi.Migrations
                     b.Navigation("Stock");
                 });
 
+            modelBuilder.Entity("StocksApi.Models.Portfolio", b =>
+                {
+                    b.HasOne("StocksApi.Models.Stock", "Stock")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StocksApi.Models.User", "User")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stock");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("StocksApi.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Portfolios");
+                });
+
+            modelBuilder.Entity("StocksApi.Models.User", b =>
+                {
+                    b.Navigation("Portfolios");
                 });
 #pragma warning restore 612, 618
         }

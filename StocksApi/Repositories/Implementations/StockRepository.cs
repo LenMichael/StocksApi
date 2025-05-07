@@ -38,7 +38,7 @@ namespace StocksApi.Repositories.Implementations
 
         public async Task<List<Stock>> GetAllAsync(QueryObject query, CancellationToken cancellationToken)
         {
-            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+            var stocks = _context.Stocks.Include(c => c.Comments).ThenInclude(u=> u.User).AsQueryable();
 
             if (!string.IsNullOrEmpty(query.CompanyName))
                 stocks = stocks.Where(x => x.CompanyName.Contains(query.CompanyName));
@@ -64,6 +64,11 @@ namespace StocksApi.Repositories.Implementations
             if (stock == null)
                 return null;
             return stock;
+        }
+
+        public async Task<Stock?> GetBySymbolAsync(string symbol, CancellationToken cancellationToken)
+        {
+            return await _context.Stocks/*.Include(c => c.Comments)*/.FirstOrDefaultAsync(x => x.Symbol == symbol, cancellationToken);
         }
 
         public async Task<bool> StockExists(int id)

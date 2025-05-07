@@ -23,7 +23,8 @@ namespace StocksApi.Controllers
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query, CancellationToken cancellationToken)
         {
             var stocks = await _stockService.GetAllAsync(query, cancellationToken);
-            var stockDtos = stocks.Select(x => x.ToStockDto());
+            var stockDtos = stocks.Select(x => x.ToStockDto()).ToList();
+
             return Ok(stockDtos);
         }
 

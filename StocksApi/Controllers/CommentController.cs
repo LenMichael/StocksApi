@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using StocksApi.Dtos.Comments;
+using StocksApi.Extensions;
 using StocksApi.Mappers;
+using StocksApi.Models;
 using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Interfaces;
 
@@ -12,10 +15,12 @@ namespace StocksApi.Controllers
     {
         private readonly ICommentService _commentService;
         private readonly IStockService _stockService;
-        public CommentController(ICommentService commentService, IStockService stockService)
+        private readonly UserManager<User> _userManager;
+        public CommentController(ICommentService commentService, IStockService stockService, UserManager<User> userManager)
         {
             _commentService = commentService;
             _stockService = stockService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -29,7 +34,7 @@ namespace StocksApi.Controllers
             return Ok(commentDtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
             var comment = await _commentService.GetByIdAsync(id, cancellationToken);
@@ -45,13 +50,18 @@ namespace StocksApi.Controllers
             if (!await _stockService.StockExists(stockId))
                 return BadRequest("Stock does not exist");
 
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+
             var comment = commentDto.ToCommentFromCreate(stockId);
+            comment.UserId = appUser.Id;
+
             await _commentService.CreateAsync(comment, cancellationToken);
 
             return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDto());
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto, CancellationToken cancellationToken)
         {
             var updatedComment = await _commentService.UpdateAsync(id, commentDto.ToCommentFromUpdate(), cancellationToken);

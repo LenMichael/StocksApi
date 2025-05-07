@@ -8,6 +8,7 @@ namespace StocksApi.Repositories.Interfaces
     {
         Task<List<Stock>> GetAllAsync(QueryObject query, CancellationToken cancellationToken);
         Task<Stock?> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task<Stock?> GetBySymbolAsync(string symbol, CancellationToken cancellationToken);
         Task<Stock> CreateAsync(Stock stock, CancellationToken cancellationToken);
         Task<Stock?> UpdateAsync(Stock stock, CancellationToken cancellationToken);
         Task<Stock> DeleteAsync(int id, CancellationToken cancellationToken);
