@@ -1,3 +1,4 @@
+using Coravel;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
@@ -13,6 +14,8 @@ using StocksApi.Repositories.Implementations;
 using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Implementations;
 using StocksApi.Services.Interfaces;
+using StocksApi.Workers;
+using StocksApi.Workers.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +76,9 @@ builder.Services.AddHangfire(config =>
 // Add Hangfire Server
 builder.Services.AddHangfireServer();
 
+// Add Coravel Services
+builder.Services.AddScheduler();
+builder.Services.AddQueue();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -124,7 +130,8 @@ builder.Services.AddAuthentication(options =>
 // ------------------------------
 // Register Application Services
 // ------------------------------
-builder.Services.AddSingleton<CommentWorker>();
+builder.Services.AddSingleton<CommentWorkerHangfire>();
+builder.Services.AddSingleton<CommentWorkerCoravel>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IStockService, StockService>();
@@ -149,6 +156,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseHangfireDashboard(); // Enable Hangfire Dashboard
 }
+
+// Ebable Scheduler
+app.Services.UseScheduler(scheduler =>
+{
+    // Scheduling tasks 
+    scheduler.Schedule(() => Console.WriteLine("Scheduled Task Executed"))
+             .EveryMinute();
+});
+
+// Add Queue
+app.Services.ConfigureQueue();
 
 // Enable CORS if allowed origins are configured in appsettings.json
 //var allowedOrigins = builder.Configuration.GetSection("AllowedCorsOrigins").Get<string[]>();

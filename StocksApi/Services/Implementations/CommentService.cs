@@ -1,23 +1,32 @@
-﻿using Hangfire;
+﻿using Coravel.Queuing.Interfaces;
+using Hangfire;
 using StocksApi.Models;
 using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Interfaces;
+using StocksApi.Workers;
+using StocksApi.Workers.Hangfire;
 
 namespace StocksApi.Services.Implementations
 {
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _commentRepo;
-        private readonly CommentWorker _commentWorker;
-        public CommentService(ICommentRepository commentRepo, CommentWorker commentWorker)
+        private readonly CommentWorkerHangfire _hangfireWorker;
+        private readonly CommentWorkerCoravel _coravelWorker;
+        private readonly IQueue _queue;
+        public CommentService(ICommentRepository commentRepo, CommentWorkerHangfire hangfireWorker,
+            CommentWorkerCoravel commentWorkerCoravel, IQueue queue)
         {
             _commentRepo = commentRepo;
-            _commentWorker = commentWorker;
+            _hangfireWorker = hangfireWorker;
+            _coravelWorker = commentWorkerCoravel;
+            _queue = queue;
         }
         public async Task<Comment> CreateAsync(Comment comment, CancellationToken cancellationToken)
         {
             comment.CreatedAt = DateTime.Now;
-            BackgroundJob.Enqueue(() => _commentWorker.LogComment(comment.Content));
+            BackgroundJob.Enqueue(() => _hangfireWorker.LogComment(comment.Content));
+            _queue.QueueAsyncTask(() => _coravelWorker.LogComment(comment.Content, comment.Title));
             return await _commentRepo.AddAsync(comment, cancellationToken);
         }
 

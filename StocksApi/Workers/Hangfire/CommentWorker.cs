@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace StocksApi.Services.Implementations
+namespace StocksApi.Workers.Hangfire
 {
-    public class CommentWorker
+    public class CommentWorkerHangfire
     {
         public void LogComment(string commentContent)
         {
