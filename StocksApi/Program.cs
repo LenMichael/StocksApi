@@ -1,5 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -52,10 +54,28 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+// Add Hangfire Services
+builder.Services.AddHangfire(config =>
+{
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+          .UseSimpleAssemblyNameTypeSerializer()
+          .UseRecommendedSerializerSettings()
+          .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+          {
+              CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+              SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+              QueuePollInterval = TimeSpan.Zero,
+              UseRecommendedIsolationLevel = true,
+              DisableGlobalLocks = true
+          });
+});
+
+// Add Hangfire Server
+builder.Services.AddHangfireServer();
+
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
 
 // ----------------------------
 // Configure Database Context
@@ -104,6 +124,7 @@ builder.Services.AddAuthentication(options =>
 // ------------------------------
 // Register Application Services
 // ------------------------------
+builder.Services.AddSingleton<CommentWorker>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IStockService, StockService>();
@@ -126,6 +147,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHangfireDashboard(); // Enable Hangfire Dashboard
 }
 
 // Enable CORS if allowed origins are configured in appsettings.json

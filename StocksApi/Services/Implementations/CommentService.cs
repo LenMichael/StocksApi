@@ -1,4 +1,5 @@
-﻿using StocksApi.Models;
+﻿using Hangfire;
+using StocksApi.Models;
 using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Interfaces;
 
@@ -7,13 +8,16 @@ namespace StocksApi.Services.Implementations
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _commentRepo;
-        public CommentService(ICommentRepository commentRepo)
+        private readonly CommentWorker _commentWorker;
+        public CommentService(ICommentRepository commentRepo, CommentWorker commentWorker)
         {
             _commentRepo = commentRepo;
+            _commentWorker = commentWorker;
         }
         public async Task<Comment> CreateAsync(Comment comment, CancellationToken cancellationToken)
         {
             comment.CreatedAt = DateTime.Now;
+            BackgroundJob.Enqueue(() => _commentWorker.LogComment(comment.Content));
             return await _commentRepo.AddAsync(comment, cancellationToken);
         }
 
