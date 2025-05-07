@@ -39,6 +39,11 @@ namespace StocksApi.Services.Implementations
             return await _stockRepo.GetByIdAsync(id, cancellationToken);
         }
 
+        public async Task<Stock?> GetBySymbolAsync(string symbol, CancellationToken cancellationToken)
+        {
+            return await _stockRepo.GetBySymbolAsync(symbol, cancellationToken);
+        }
+
         public async Task<bool> StockExists(int id)
         {
             return await _stockRepo.StockExists(id);

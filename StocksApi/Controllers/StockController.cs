@@ -6,6 +6,7 @@ using StocksApi.Filters;
 using StocksApi.Mappers;
 using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Interfaces;
+using StocksApi.Validators.Stocks;
 
 namespace StocksApi.Controllers
 {
@@ -43,6 +44,12 @@ namespace StocksApi.Controllers
         {
             if (stockDto == null)
                 return BadRequest();
+
+            // Custom validation
+            var errors = CustomStockValidator.Validate(stockDto);
+            if (errors.Any())
+                return BadRequest(new { Errors = errors });
+
             var stock = stockDto.ToStockFromCreateDto();
             await _stockService.CreateAsync(stockDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock.ToStockDto());

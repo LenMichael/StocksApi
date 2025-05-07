@@ -14,14 +14,12 @@ namespace StocksApi.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IStockService _stockService;
-        private readonly IStockRepository _stockRepo;
         private readonly IPortfolioRepository _portfolioRepo;
-        public PortfolioController(UserManager<User> userManager, IStockService stockService, IPortfolioRepository portfolioRepository, IStockRepository stockRepo)
+        public PortfolioController(UserManager<User> userManager, IStockService stockService, IPortfolioRepository portfolioRepository)
         {
             _userManager = userManager;
             _stockService = stockService;
             _portfolioRepo = portfolioRepository;
-            _stockRepo = stockRepo;
         }
 
         [HttpGet]
@@ -40,7 +38,8 @@ namespace StocksApi.Controllers
         {
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
-            var stock = await _stockRepo.GetBySymbolAsync(symbol, cancellationToken);
+            var stock = await _stockService.GetBySymbolAsync(symbol, cancellationToken);
+            //var stock = await _stockRepo.GetBySymbolAsync(symbol, cancellationToken);
 
             if (stock == null) return NotFound("Stock not found");
 

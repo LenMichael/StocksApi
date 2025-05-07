@@ -14,16 +14,16 @@ using StocksApi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add User Secrets to Configuration
 //builder.Configuration.AddUserSecrets<Program>();
 
 
-// Add services to the container.
-
+// -------------------------------
+// Configure Swagger/OpenAPI
+// -------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
@@ -53,13 +53,19 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 
-
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+
+// ----------------------------
+// Configure Database Context
+// ----------------------------
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ----------------------------
+// Configure Identity
+// ----------------------------
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -69,6 +75,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
 }).AddEntityFrameworkStores<ApplicationDBContext>();
 
+// ----------------------------
+// Configure Authentication
+// ----------------------------
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme =
@@ -92,16 +101,21 @@ builder.Services.AddAuthentication(options =>
 });
 
 
-
+// ------------------------------
+// Register Application Services
+// ------------------------------
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 
-
+// ----------------------------------
+// Add FluentValidation on pipeline
+// ----------------------------------
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters(); 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -114,9 +128,38 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Enable CORS if allowed origins are configured in appsettings.json
+//var allowedOrigins = builder.Configuration.GetSection("AllowedCorsOrigins").Get<string[]>();
+
+//if (!allowedOrigins.IsNullOrEmpty() && allowedOrigins.Any())
+//{
+//    app.UseCors(builder =>
+//        builder.WithOrigins(allowedOrigins)
+//               .AllowAnyMethod()
+//               .AllowAnyHeader());
+//}
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.Use(async (context, next) =>
+{
+    var user = context.User;
+    //For debbuging: place a breakpoint on the line below
+    //System.Diagnostics.Debugger.Break();
+
+    //Optionally log the claims
+    var claims = user.Claims.Select(c => new { c.Type, c.Value }).ToList();
+    if (!claims.IsNullOrEmpty())
+    {
+        foreach (var claim in claims)
+        {
+            Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+        }
+    }
+    await next.Invoke();
+});
 
 app.UseAuthorization();
 
