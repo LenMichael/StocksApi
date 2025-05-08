@@ -15,6 +15,7 @@ using StocksApi.Repositories.Interfaces;
 using StocksApi.Services.Implementations;
 using StocksApi.Services.Interfaces;
 using StocksApi.Workers;
+using StocksApi.Workers.Coravel;
 using StocksApi.Workers.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -132,6 +133,7 @@ builder.Services.AddAuthentication(options =>
 // ------------------------------
 builder.Services.AddSingleton<CommentWorkerHangfire>();
 builder.Services.AddSingleton<CommentWorkerCoravel>();
+builder.Services.AddSingleton<DailyReportWorker>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IStockService, StockService>();
@@ -163,6 +165,8 @@ app.Services.UseScheduler(scheduler =>
     // Scheduling tasks 
     scheduler.Schedule(() => Console.WriteLine("Scheduled Task Executed"))
              .EveryMinute();
+    scheduler.Schedule<DailyReportWorker>()
+             .DailyAtHour(9); 
 });
 
 // Add Queue
