@@ -17,6 +17,7 @@ using StocksApi.Services.Interfaces;
 using StocksApi.Workers;
 using StocksApi.Workers.Coravel;
 using StocksApi.Workers.Hangfire;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -131,6 +132,13 @@ builder.Services.AddAuthentication(options =>
 // ------------------------------
 // Register Application Services
 // ------------------------------
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = builder.Configuration.GetConnectionString("Redis");
+    return ConnectionMultiplexer.Connect(configuration);
+});
+
+builder.Services.AddSingleton<RedisCacheService>();
 builder.Services.AddSingleton<CommentWorkerHangfire>();
 builder.Services.AddSingleton<CommentWorkerCoravel>();
 builder.Services.AddSingleton<DailyReportWorker>();
