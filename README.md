@@ -49,11 +49,11 @@ A robust, modular RESTful API for stock management, portfolio tracking, and real
   - dotnet ef database update  
 
 4. **Run the application**
-   - dotnet run --project StocksApi
+  - dotnet run --project StocksApi
 
 
 5. **Access Swagger UI**
-    - Navigate to [https://localhost:5001/swagger](https://localhost:5001/swagger) (or the port shown in your console).
+  - Navigate to [https://localhost:5001/swagger](https://localhost:5001/swagger) (or the port shown in your console).
 
 ### Running Tests
 dotnet test
