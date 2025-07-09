@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stocksapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stocksapi
+  template:
+    metadata:
+      labels:
+        app: stocksapi
+    spec:
+      containers:
+      - name: stocksapi
+        image: mikeius05/stocksapi:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ConnectionStrings__DefaultConnection
+          value: "Server=sqlserver;Database=StocksDB;User=sa;Password=SuperStrongP@ssw0rd123;"
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: stocksapi-db-secret
+          #     key: database_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stocksapi
+spec:
+  type: LoadBalancer #NodePort #ClusterIP
+  selector:
+    app: stocksapi
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+
+

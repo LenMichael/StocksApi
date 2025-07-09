@@ -160,12 +160,12 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseHangfireDashboard(); // Enable Hangfire Dashboard
-}
+// }
 
 // Ebable Scheduler
 app.Services.UseScheduler(scheduler =>
